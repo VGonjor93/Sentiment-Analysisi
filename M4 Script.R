@@ -303,7 +303,7 @@ Galaxy.df.nzv_trainIndex <- createDataPartition(Galaxy.df.nzv$galaxysentiment, p
 Galaxy.df.nzv_Train <- Galaxy.df.nzv[ Galaxy.df.nzv_trainIndex,]
 Galaxy.df.nzv_Test  <- Galaxy.df.nzv[-Galaxy.df.nzv_trainIndex,]
 
-Results[["Galaxy.df.nzv"]] <- OOTB.Galaxy(Galaxy.df.nzv_Train, Galaxy.df.nzv_Tes)
+Results[["Galaxy.df.nzv"]] <- OOTB.Galaxy(Galaxy.df.nzv_Train, Galaxy.df.nzv_Test)
 
 #Galaxy rfe. 
 #Data Partition
@@ -316,4 +316,164 @@ Results[["Galaxy.df.rfe"]] <- OOTB.Galaxy(Galaxy.df.rfe_Train, Galaxy.df.rfe_Tes
 
 #RECODING THE DEPENDANT VARIABLE -----
 
+# create a new dataset that will be used for recoding sentiment
+iPhone.rc <- iPhone.df
+iPhone.rc.nzv <- iPhone.df.nzv
+iPhone.rc.rfe <- iPhone.df.rfe
 
+Galaxy.rc <- Galaxy.df
+Galaxy.rc.nzv <- Galaxy.df.nzv
+Galaxy.rc.rfe <- Galaxy.df.rfe
+
+# recode sentiment to combine factor levels 0 & 1 and 4 & 5
+iPhone.rc$iphonesentiment <- recode(iPhone.df$iphonesentiment, '0' = 1, '1' = 1, '2' = 2, '3' = 3, '4' = 4, '5' = 4) 
+iPhone.rc.nzv$iphonesentiment <- recode(iPhone.df.nzv$iphonesentiment, '0' = 1, '1' = 1, '2' = 2, '3' = 3, '4' = 4, '5' = 4) 
+iPhone.rc.rfe$iphonesentiment <- recode(iPhone.df.rfe$iphonesentiment, '0' = 1, '1' = 1, '2' = 2, '3' = 3, '4' = 4, '5' = 4) 
+
+Galaxy.rc$galaxysentiment <- recode(Galaxy.df$galaxysentiment, '0' = 1, '1' = 1, '2' = 2, '3' = 3, '4' = 4, '5' = 4) 
+Galaxy.rc.nzv$galaxysentiment <- recode(Galaxy.df.nzv$galaxysentiment, '0' = 1, '1' = 1, '2' = 2, '3' = 3, '4' = 4, '5' = 4) 
+Galaxy.rc.rfe$galaxysentiment <- recode(Galaxy.df.rfe$galaxysentiment, '0' = 1, '1' = 1, '2' = 2, '3' = 3, '4' = 4, '5' = 4) 
+
+
+# make iphonesentiment a factor
+iPhone.rc$iphonesentiment <- as.factor(iPhone.rc$iphonesentiment)
+iPhone.rc.nzv$iphonesentiment <- as.factor(iPhone.rc.nzv$iphonesentiment)
+iPhone.rc.rfe$iphonesentiment <- as.factor(iPhone.rc.rfe$iphonesentiment)
+
+Galaxy.rc$galaxysentiment <- as.factor(Galaxy.rc$galaxysentiment)
+Galaxy.rc.nzv$galaxysentiment <- as.factor(Galaxy.rc.nzv$galaxysentiment)
+Galaxy.rc.rfe$galaxysentiment <- as.factor(Galaxy.rc.rfe$galaxysentiment)
+
+
+
+
+#IPHONE RC MODELS -----
+Results.rc <- list()
+
+#iPhone no feat. eng. 
+#Data Partition
+set.seed(420)
+iPhone.rc_trainIndex <- createDataPartition(iPhone.rc$iphonesentiment, p = .7, list = F, times = 1)
+iPhone.rc_Train <- iPhone.rc[ iPhone.rc_trainIndex,]
+iPhone.rc_Test  <- iPhone.rc[-iPhone.rc_trainIndex,]
+
+Results.rc[["iPhone.rc"]] <- OOTB.iPhone(iPhone.rc_Train, iPhone.rc_Test)
+
+#iPhone nzv. 
+#Data Partition
+set.seed(420)
+iPhone.rc.nzv_trainIndex <- createDataPartition(iPhone.rc.nzv$iphonesentiment, p = .7, list = F, times = 1)
+iPhone.rc.nzv_Train <- iPhone.rc.nzv[ iPhone.rc.nzv_trainIndex,]
+iPhone.rc.nzv_Test  <- iPhone.rc.nzv[-iPhone.rc.nzv_trainIndex,]
+
+Results.rc[["iPhone.rc.nzv"]] <- OOTB.iPhone(iPhone.rc.nzv_Train, iPhone.rc.nzv_Test)
+
+#iPhone rfe. 
+#Data Partition
+set.seed(420)
+iPhone.rc.rfe_trainIndex <- createDataPartition(iPhone.rc.rfe$iphonesentiment, p = .7, list = F, times = 1)
+iPhone.rc.rfe_Train <- iPhone.rc.rfe[ iPhone.rc.rfe_trainIndex,]
+iPhone.rc.rfe_Test  <- iPhone.rc.rfe[-iPhone.rc.rfe_trainIndex,]
+
+Results.rc[["iPhone.rc.rfe"]] <- OOTB.iPhone(iPhone.rc.rfe_Train, iPhone.rc.rfe_Test)
+
+#GALAXY RC MODELS -----
+
+#Galaxy no feat. eng. 
+#Data Partition
+set.seed(420)
+Galaxy.rc_trainIndex <- createDataPartition(Galaxy.rc$galaxysentiment, p = .7, list = F, times = 1)
+Galaxy.rc_Train <- Galaxy.rc[ Galaxy.rc_trainIndex,]
+Galaxy.rc_Test  <- Galaxy.rc[-Galaxy.rc_trainIndex,]
+
+Results.rc[["Galaxy.rc"]] <- OOTB.Galaxy(Galaxy.rc_Train, Galaxy.rc_Test)
+
+#Galaxy nzv. 
+#Data Partition
+set.seed(420)
+Galaxy.rc.nzv_trainIndex <- createDataPartition(Galaxy.rc.nzv$galaxysentiment, p = .7, list = F, times = 1)
+Galaxy.rc.nzv_Train <- Galaxy.rc.nzv[ Galaxy.rc.nzv_trainIndex,]
+Galaxy.rc.nzv_Test  <- Galaxy.rc.nzv[-Galaxy.rc.nzv_trainIndex,]
+
+Results.rc[["Galaxy.rc.nzv"]] <- OOTB.Galaxy(Galaxy.rc.nzv_Train, Galaxy.rc.nzv_Test)
+
+#Galaxy rfe. 
+#Data Partition
+set.seed(420)
+Galaxy.rc.rfe_trainIndex <- createDataPartition(Galaxy.rc.rfe$galaxysentiment, p = .7, list = F, times = 1)
+Galaxy.rc.rfe_Train <- Galaxy.rc.rfe[ Galaxy.rc.rfe_trainIndex,]
+Galaxy.rc.rfe_Test  <- Galaxy.rc.rfe[-Galaxy.rc.rfe_trainIndex,]
+
+Results.rc[["Galaxy.rc.rfe"]] <- OOTB.Galaxy(Galaxy.rc.rfe_Train, Galaxy.rc.rfe_Test)
+
+
+
+#PCA -----
+
+iPhone.parameters <- preProcess(iPhone.df_Train[,-59], method=c("center", "scale", "pca"), thresh = 0.95)
+print(iPhone.parameters)
+iPhone.nzv.parameters <- preProcess(iPhone.df.nzv_Train[,-12], method=c("center", "scale", "pca"), thresh = 0.95)
+print(iPhone.nzv.parameters)
+iPhone.rfe.parameters <- preProcess(iPhone.df.rfe_Train[,-12], method=c("center", "scale", "pca"), thresh = 0.95)
+print(iPhone.rfe.parameters)
+
+Galaxy.parameters <- preProcess(Galaxy.df_Train[,-59], method=c("center", "scale", "pca"), thresh = 0.95)
+print(Galaxy.parameters)
+Galaxy.nzv.parameters <- preProcess(Galaxy.df.nzv_Train[,-12], method=c("center", "scale", "pca"), thresh = 0.95)
+print(Galaxy.nzv.parameters)
+Galaxy.rfe.parameters <- preProcess(Galaxy.df.rfe_Train[,-11], method=c("center", "scale", "pca"), thresh = 0.95)
+print(Galaxy.rfe.parameters)
+
+
+#iPHONE PCA MODELS-------
+Results.pca <- list()
+
+#iPhone df pca
+iPhone.df.pca_Train <- predict(iPhone.parameters, iPhone.df_Train[,-59])
+iPhone.df.pca_Train$iphonesentiment <- iPhone.df_Train$iphonesentiment
+iPhone.df.pca_Test <- predict(iPhone.parameters, iPhone.df_Test[,-59])
+iPhone.df.pca_Test$iphonesentiment <- iPhone.df_Test$iphonesentiment
+
+Results.pca[["iPhone.pca"]] <- OOTB.iPhone(iPhone.df.pca_Train, iPhone.df.pca_Test)
+
+#iPhone nzv pca
+iPhone.nzv.pca_Train <- predict(iPhone.nzv.parameters, iPhone.df.nzv_Train[,-12])
+iPhone.nzv.pca_Train$iphonesentiment <- iPhone.df.nzv_Train$iphonesentiment
+iPhone.nzv.pca_Test <- predict(iPhone.nzv.parameters, iPhone.df.nzv_Test[,-12])
+iPhone.nzv.pca_Test$iphonesentiment <- iPhone.df.nzv_Test$iphonesentiment
+
+Results.pca[["iPhone.nzv.pca"]] <- OOTB.iPhone(iPhone.nzv.pca_Train, iPhone.nzv.pca_Test)
+
+#iPhone rfe pca
+iPhone.rfe.pca_Train <- predict(iPhone.rfe.parameters, iPhone.df.rfe_Train[,-12])
+iPhone.rfe.pca_Train$iphonesentiment <- iPhone.df.rfe_Train$iphonesentiment
+iPhone.rfe.pca_Test <- predict(iPhone.rfe.parameters, iPhone.df.rfe_Test[,-12])
+iPhone.rfe.pca_Test$iphonesentiment <- iPhone.df.rfe_Test$iphonesentiment
+
+Results.pca[["iPhone.rfe.pca"]] <- OOTB.iPhone(iPhone.rfe.pca_Train, iPhone.rfe.pca_Test)
+
+#GALAXY PCA MODELS-----
+
+#Galaxy df pca
+Galaxy.df.pca_Train <- predict(Galaxy.parameters, Galaxy.df_Train[,-59])
+Galaxy.df.pca_Train$galaxysentiment <- Galaxy.df_Train$galaxysentiment
+Galaxy.df.pca_Test <- predict(Galaxy.parameters, Galaxy.df_Test[,-59])
+Galaxy.df.pca_Test$galaxysentiment <- Galaxy.df_Test$galaxysentiment
+
+Results.pca[["Galaxy.pca"]] <- OOTB.Galaxy(Galaxy.df.pca_Train, Galaxy.df.pca_Test)
+
+#Galaxy nzv pca
+Galaxy.nzv.pca_Train <- predict(Galaxy.nzv.parameters, Galaxy.df.nzv_Train[,-12])
+Galaxy.nzv.pca_Train$galaxysentiment <- Galaxy.df.nzv_Train$galaxysentiment
+Galaxy.nzv.pca_Test <- predict(Galaxy.nzv.parameters, Galaxy.df.nzv_Test[,-12])
+Galaxy.nzv.pca_Test$galaxysentiment <- Galaxy.df.nzv_Test$galaxysentiment
+
+Results.pca[["Galaxy.nzv.pca"]] <- OOTB.Galaxy(Galaxy.nzv.pca_Train, Galaxy.nzv.pca_Test)
+
+#Galaxy rfe pca
+Galaxy.rfe.pca_Train <- predict(Galaxy.rfe.parameters, Galaxy.df.rfe_Train[,-11])
+Galaxy.rfe.pca_Train$galaxysentiment <- Galaxy.df.rfe_Train$galaxysentiment
+Galaxy.rfe.pca_Test <- predict(Galaxy.rfe.parameters, Galaxy.df.rfe_Test[,-11])
+Galaxy.rfe.pca_Test$galaxysentiment <- Galaxy.df.rfe_Test$galaxysentiment
+
+Results.pca[["Galaxy.rfe.pca"]] <- OOTB.Galaxy(Galaxy.rfe.pca_Train, Galaxy.rfe.pca_Test)
