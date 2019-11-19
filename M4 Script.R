@@ -5,7 +5,7 @@ if (!require("pacman")) {
   install.packages("pacman")
 } else{
   library(pacman)
-  pacman::p_load(kknn, e1071, ggplot2, caret, readr, dplyr, tidyr, doParallel, plotly, corrplot)
+  pacman::p_load(ROSE, kknn, e1071, ggplot2, caret, readr, dplyr, tidyr, doParallel, plotly, corrplot)
 }
 
 #CLUSTERS -----
@@ -477,3 +477,79 @@ Galaxy.rfe.pca_Test <- predict(Galaxy.rfe.parameters, Galaxy.df.rfe_Test[,-11])
 Galaxy.rfe.pca_Test$galaxysentiment <- Galaxy.df.rfe_Test$galaxysentiment
 
 Results.pca[["Galaxy.rfe.pca"]] <- OOTB.Galaxy(Galaxy.rfe.pca_Train, Galaxy.rfe.pca_Test)
+
+
+#UP-SAMPLING -----
+
+iPhone.rc.up_Train <- upSample(x = iPhone.rc_Train[, -ncol(iPhone.rc_Train)],
+                         y = iPhone.rc_Train$iphonesentiment, yname = "iphonesentiment")
+iPhone.rc.nzv.up_Train <- upSample(x = iPhone.rc.nzv_Train[, -ncol(iPhone.rc.nzv_Train)],
+                               y = iPhone.rc.nzv_Train$iphonesentiment, yname = "iphonesentiment")
+iPhone.rc.rfe.up_Train <- upSample(x = iPhone.rc.rfe_Train[, -ncol(iPhone.rc.rfe_Train)],
+                                   y = iPhone.rc.rfe_Train$iphonesentiment, yname = "iphonesentiment")
+
+Galaxy.rc.up_Train <- upSample(x = Galaxy.rc_Train[, -ncol(Galaxy.rc_Train)],
+                               y = Galaxy.rc_Train$galaxysentiment, yname = "galaxysentiment")
+Galaxy.rc.nzv.up_Train <- upSample(x = Galaxy.rc.nzv_Train[, -ncol(Galaxy.rc.nzv_Train)],
+                               y = Galaxy.rc.nzv_Train$galaxysentiment, yname = "galaxysentiment")
+Galaxy.rc.rfe.up_Train <- upSample(x = Galaxy.rc.rfe_Train[, -ncol(Galaxy.rc.rfe_Train)],
+                                   y = Galaxy.rc.rfe_Train$galaxysentiment, yname = "galaxysentiment")
+
+Results.up <- list()
+Results.up[["Iphone.rc"]] <- OOTB.iPhone(iPhone.rc.up_Train, iPhone.rc_Test)
+Results.up[["Iphone.rc.nzv"]] <- OOTB.iPhone(iPhone.rc.nzv.up_Train, iPhone.rc.nzv_Test)
+Results.up[["Iphone.rc.rfe"]] <- OOTB.iPhone(iPhone.rc.rfe.up_Train, iPhone.rc.rfe_Test)
+
+Results.up[["Galaxy.rc"]] <- OOTB.Galaxy(Galaxy.rc.up_Train, Galaxy.rc_Test)
+Results.up[["Galaxy.rc.nzv"]] <- OOTB.Galaxy(Galaxy.rc.nzv.up_Train, Galaxy.rc.nzv_Test)
+Results.up[["Galaxy.rc.rfe."]] <- OOTB.Galaxy(Galaxy.rc.rfe.up_Train, Galaxy.rc.rfe_Test)
+
+#DOWN-SAMPLING -----
+
+iPhone.rc.down_Train <- downSample(x = iPhone.rc_Train[, -ncol(iPhone.rc_Train)],
+                               y = iPhone.rc_Train$iphonesentiment, yname = "iphonesentiment")
+iPhone.rc.nzv.down_Train <- downSample(x = iPhone.rc.nzv_Train[, -ncol(iPhone.rc.nzv_Train)],
+                                   y = iPhone.rc.nzv_Train$iphonesentiment, yname = "iphonesentiment")
+iPhone.rc.rfe.down_Train <- downSample(x = iPhone.rc.rfe_Train[, -ncol(iPhone.rc.rfe_Train)],
+                                   y = iPhone.rc.rfe_Train$iphonesentiment, yname = "iphonesentiment")
+
+Galaxy.rc.down_Train <- downSample(x = Galaxy.rc_Train[, -ncol(Galaxy.rc_Train)],
+                               y = Galaxy.rc_Train$galaxysentiment, yname = "galaxysentiment")
+Galaxy.rc.nzv.down_Train <- downSample(x = Galaxy.rc.nzv_Train[, -ncol(Galaxy.rc.nzv_Train)],
+                                   y = Galaxy.rc.nzv_Train$galaxysentiment, yname = "galaxysentiment")
+Galaxy.rc.rfe.down_Train <- downSample(x = Galaxy.rc.rfe_Train[, -ncol(Galaxy.rc.rfe_Train)],
+                                   y = Galaxy.rc.rfe_Train$galaxysentiment, yname = "galaxysentiment")
+
+Results.down <- list()
+Results.down[["Iphone.rc"]] <- OOTB.iPhone(iPhone.rc.down_Train, iPhone.rc_Test)
+Results.down[["Iphone.rc.nzv"]] <- OOTB.iPhone(iPhone.rc.nzv.down_Train, iPhone.rc.nzv_Test)
+Results.down[["Iphone.rc.rfe"]] <- OOTB.iPhone(iPhone.rc.rfe.down_Train, iPhone.rc.rfe_Test)
+
+Results.down[["Galaxy.rc"]] <- OOTB.Galaxy(Galaxy.rc.down_Train, Galaxy.rc_Test)
+Results.down[["Galaxy.rc.nzv"]] <- OOTB.Galaxy(Galaxy.rc.nzv.down_Train, Galaxy.rc.nzv_Test)
+Results.down[["Galaxy.rc.rfe."]] <- OOTB.Galaxy(Galaxy.rc.rfe.down_Train, Galaxy.rc.rfe_Test)
+
+
+#FINAL PREFICTIONS -------
+LargeMatrix.df <- read_csv("C:/Users/poni6/Desktop/Data Analysis/Modulo 4/Data/LargeMatrixMerged.csv")
+LargeMatrix.df$iphonesentiment <- as.factor(LargeMatrix.df$iphonesentiment)
+LargeMatrix.df$galaxysentiment <- as.factor(LargeMatrix.df$galaxysentiment)
+
+#iPhone
+iPhone.pred <- predict(Results.rc[["iPhone.rc"]][[1]]$RF, LargeMatrix.df)
+LargeMatrix.df$iphonesentiment <- iPhone.pred
+plot_ly(LargeMatrix.df, x= ~LargeMatrix.df$iphonesentiment, type='histogram')
+#Galaxy
+Galaxy.pred <- predict(Results.rc[["Galaxy.rc"]][[1]]$RF, LargeMatrix.df)
+LargeMatrix.df$galaxysentiment <- Galaxy.pred
+plot_ly(LargeMatrix.df, x= ~LargeMatrix.df$galaxysentiment, type='histogram')
+
+summary(LargeMatrix.df)
+
+#PREFERENCE ----
+LargeMatrix.df$preference <- (as.numeric(LargeMatrix.df$iphonesentiment) - as.numeric(LargeMatrix.df$galaxysentiment))
+
+LargeMatrix.df$preference <- ifelse(LargeMatrix.df$preference == 0, "Indiferent", ifelse(LargeMatrix.df$preference > 0, "iPhone", ifelse(LargeMatrix.df$preference < 0, "Galaxy", "")))
+
+pie(table(LargeMatrix.df$preference))
+
